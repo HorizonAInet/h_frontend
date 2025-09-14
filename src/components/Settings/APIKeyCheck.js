@@ -1,44 +1,48 @@
-import React, { useState, useEffect } from 'react'
-import { Key, AlertCircle, ArrowRight } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
-import APIKeySettings from './APIKeySettings'
+import React, { useState, useEffect } from "react";
+import { Key, AlertCircle, ArrowRight } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import APIKeySettings from "./APIKeySettings";
 
 const APIKeyCheck = ({ onAPIKeyVerified }) => {
-  const { user, session } = useAuth()
-  const [hasApiKey, setHasApiKey] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
+  const { user, session } = useAuth();
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (user && session) {
-      checkAPIKey()
+      checkAPIKey();
     }
 
     // Listen for API key updates
     const handleAPIKeyUpdate = (event) => {
-      const { hasApiKey: newHasApiKey } = event.detail
-      setHasApiKey(newHasApiKey)
+      const { hasApiKey: newHasApiKey } = event.detail;
+      setHasApiKey(newHasApiKey);
       if (newHasApiKey && onAPIKeyVerified) {
-        onAPIKeyVerified()
+        onAPIKeyVerified();
       }
-    }
+    };
 
-    window.addEventListener('apiKeyUpdated', handleAPIKeyUpdate)
-    return () => window.removeEventListener('apiKeyUpdated', handleAPIKeyUpdate)
-  }, [user, session, onAPIKeyVerified])
+    window.addEventListener("apiKeyUpdated", handleAPIKeyUpdate);
+    return () =>
+      window.removeEventListener("apiKeyUpdated", handleAPIKeyUpdate);
+  }, [user, session, onAPIKeyVerified]);
 
   const checkAPIKey = async () => {
     if (!user || !session) return;
-    
+
     try {
       const token = session.access_token;
-      const response = await fetch('/api/user/api-key/info', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      })
-      
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key/info`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         try {
           const text = await response.text();
@@ -49,32 +53,35 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
               onAPIKeyVerified();
             }
           } catch (jsonError) {
-            console.error('Failed to parse API key info response as JSON:', text);
+            console.error(
+              "Failed to parse API key info response as JSON:",
+              text
+            );
             // Silently handle proxy errors during initial load
-            if (!text.includes('Proxy error')) {
-              console.error('Failed to load API key information');
+            if (!text.includes("Proxy error")) {
+              console.error("Failed to load API key information");
             }
           }
         } catch (textError) {
-          console.error('Failed to get API key info response text:', textError);
+          console.error("Failed to get API key info response text:", textError);
         }
       }
     } catch (error) {
-      console.error('Error checking API key:', error)
+      console.error("Error checking API key:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSetupAPIKey = () => {
-    setShowSettings(true)
-  }
+    setShowSettings(true);
+  };
 
   const handleContinue = () => {
     if (onAPIKeyVerified) {
-      onAPIKeyVerified()
+      onAPIKeyVerified();
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -84,7 +91,7 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
           <p className="text-gray-600">Checking your settings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (hasApiKey && !showSettings) {
@@ -94,9 +101,12 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Key className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Ready to Go!</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Ready to Go!
+          </h2>
           <p className="text-gray-600 mb-6">
-            Your API key is configured. You can now start uploading and querying your data.
+            Your API key is configured. You can now start uploading and querying
+            your data.
           </p>
           <button
             onClick={handleContinue}
@@ -107,7 +117,7 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (showSettings) {
@@ -115,13 +125,17 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Setup Your API Key</h1>
-            <p className="text-gray-600">Configure your Groq API key to start querying your data</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Setup Your API Key
+            </h1>
+            <p className="text-gray-600">
+              Configure your Groq API key to start querying your data
+            </p>
           </div>
           <APIKeySettings />
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -130,12 +144,14 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Key className="w-8 h-8 text-blue-600" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">API Key Required</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          API Key Required
+        </h2>
         <p className="text-gray-600 mb-6">
-          To start querying your data, you'll need to provide your own Groq API key. 
-          This ensures you have full control over your usage and costs.
+          To start querying your data, you'll need to provide your own Groq API
+          key. This ensures you have full control over your usage and costs.
         </p>
-        
+
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
@@ -150,7 +166,7 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
             </div>
           </div>
         </div>
-        
+
         <button
           onClick={handleSetupAPIKey}
           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -158,12 +174,12 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
           Setup API Key
           <ArrowRight size={16} />
         </button>
-        
+
         <p className="text-xs text-gray-500 mt-4">
-          Get your free API key at{' '}
-          <a 
-            href="https://console.groq.com" 
-            target="_blank" 
+          Get your free API key at{" "}
+          <a
+            href="https://console.groq.com"
+            target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
           >
@@ -172,7 +188,7 @@ const APIKeyCheck = ({ onAPIKeyVerified }) => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default APIKeyCheck
+export default APIKeyCheck;

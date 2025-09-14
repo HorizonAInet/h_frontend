@@ -38,12 +38,15 @@ const APIKeySettings = () => {
     try {
       const token = session.access_token;
 
-      const response = await fetch("/api/user/api-key/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key/info`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         try {
@@ -103,17 +106,20 @@ const APIKeySettings = () => {
     try {
       const token = session.access_token;
 
-      const response = await fetch("/api/user/api-key", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          api_key: apiKey,
-          provider: "groq",
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            api_key: apiKey,
+            provider: "groq",
+          }),
+        }
+      );
 
       // Handle potential proxy error responses
       let data;
@@ -201,13 +207,16 @@ const APIKeySettings = () => {
     try {
       const token = session.access_token;
 
-      const response = await fetch("/api/user/api-key", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       // Handle potential proxy error responses
       let data;
