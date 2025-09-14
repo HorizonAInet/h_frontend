@@ -255,12 +255,15 @@ const APIKeySetup = ({ onAPIKeySet }) => {
 
     try {
       const token = session.access_token;
-      const response = await fetch("/api/user/api-key/info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key/info`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await response.json();
       if (data.has_api_key) {
@@ -300,17 +303,20 @@ const APIKeySetup = ({ onAPIKeySet }) => {
         return;
       }
 
-      const response = await fetch("/api/user/api-key", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          api_key: apiKey.trim(),
-          provider: "groq",
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/user/api-key`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            api_key: apiKey.trim(),
+            provider: "groq",
+          }),
+        }
+      );
 
       const data = await response.json();
 
